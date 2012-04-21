@@ -23,6 +23,7 @@ from csbot.core import Plugin, PluginFeatures
 # TODO:
 # - auto expansion!
 
+
 class Abbreviations(Plugin):
     features = PluginFeatures()
 
@@ -50,7 +51,8 @@ class Abbreviations(Plugin):
             if len(event.data) < 1:
                 event.error("I can't add an empty abbreviation!")
             else:
-                event.error("You need to define the expansion for '{}'".format(event.data[0]))
+                event.error("You need to define the expansion for '{}'"
+                        .format(event.data[0]))
 
             event.reply(self.USAGE_ADD, True)
             return
@@ -60,12 +62,15 @@ class Abbreviations(Plugin):
         current = self.db.abbrs.find_one({"abbreviation": abbreviation})
 
         if current is not None:
-            event.error("I already have an expansion, '{}' = '{}'. Try the abbr.edit command.".format(abbreviation, current["expansion"]))
+            event.error("I already have an expansion, '{}' = '{}'. \
+                    Try the abbr.edit command."
+                    .format(abbreviation, current["expansion"]))
             event.reply(self.USAGE_EDIT, True)
         else:
-            self.db.abbrs.insert({"abbreviation": abbreviation, "expansion": expansion})
+            self.db.abbrs.insert({
+                "abbreviation": abbreviation,
+                "expansion": expansion})
             event.reply("Added '{}' = '{}'.".format(abbreviation, expansion))
-
 
     @features.command('abbr.edit')
     def edit_command(self, event):
@@ -73,7 +78,8 @@ class Abbreviations(Plugin):
             if len(event.data) < 1:
                 event.error("I can't edit nothing!")
             else:
-                event.error("You need to define a new expansion for '{}'".format(event.data[0]))
+                event.error("You need to define a new expansion for '{}'"
+                        .format(event.data[0]))
 
             event.reply(self.USAGE_EDIT, True)
             return
@@ -83,11 +89,15 @@ class Abbreviations(Plugin):
         current = self.db.abbrs.find_one({"abbreviation": abbreviation})
 
         if current is None:
-            event.error("I don't have an abbreviation for '{}'.  Try the abbr.add command instead.".format(abbreviation))
+            event.error("I don't have an abbreviation for '{}'.  Try the \
+                    abbr.add command instead.".format(abbreviation))
             event.reply(self.USAGE_ADD, True)
         else:
-            self.db.abbrs.update({"abbreviation": abbreviation}, {"$set": {"expansion": expansion}})
-            event.reply("Changed abbreviation for '{}' from '{}' to '{}'.".format(abbreviation, current["expansion"], expansion))
+            self.db.abbrs.update(
+                    {"abbreviation": abbreviation},
+                    {"$set": {"expansion": expansion}})
+            event.reply("Changed abbreviation for '{}' from '{}' to '{}'."
+                    .format(abbreviation, current["expansion"], expansion))
 
     @features.command('abbr')
     def abbr_command(self, event):
@@ -100,9 +110,11 @@ class Abbreviations(Plugin):
         current = self.db.abbrs.find_one({"abbreviation": abbreviation})
 
         if current is None:
-            event.error("I don't have an abbreviation for '{}'.  Ask someone to abbr.add one.".format(abbreviation))
+            event.error("I don't have an abbreviation for '{}'.  \
+                    Ask someone to abbr.add one.".format(abbreviation))
         else:
-            event.reply("'{}' = '{}'.  If this abbreviation is wrong, abbr.edit it.".format(abbreviation, current["expansion"]))
+            event.reply("'{}' = '{}'.  If this abbreviation is wrong, \
+                    abbr.edit it.".format(abbreviation, current["expansion"]))
 
     @features.command('abbr.rem')
     @features.command('abbr.del')
@@ -119,7 +131,5 @@ class Abbreviations(Plugin):
             event.reply("'{}' was not in my list anyway.".format(abbreviation))
         else:
             self.db.abbrs.remove({"abbreviation": abbreviation})
-            event.reply("Removed the abbreviation '{}' = '{}'".format(abbreviation, current["expansion"]))
-
-        
-
+            event.reply("Removed the abbreviation '{}' = '{}'"
+                    .format(abbreviation, current["expansion"]))
